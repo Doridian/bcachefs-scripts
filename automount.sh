@@ -2,7 +2,7 @@
 
 set -e
 
-BCACHE_DEVICES="$(lsblk --fs --list --json | jq -r '.blockdevices[] | select(.fstype == "bcache") | .name')"
+BCACHE_DEVICES="$(lsblk --fs --list --json --output=fstype,path | jq -r '.blockdevices[] | select(.fstype == "bcache") | .path')"
 
 bcachefs_uuid() {
 	DEV="$1"
@@ -18,7 +18,6 @@ bcachefs_mount() {
 	DEVICES=""
 	for dev in $BCACHE_DEVICES
 	do
-		dev="/dev/$dev"
 		if [ "$(bcachefs_uuid "$dev")" == "$UUID" ]
 		then
 			DEVICE="$dev"
@@ -34,4 +33,3 @@ bcachefs_mount() {
 	fi
 	mount -t bcachefs "$DEVICES" "$MOUNTPOINT"
 }
-
